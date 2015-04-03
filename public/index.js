@@ -1,53 +1,66 @@
-/*global jQuery, OT*/
+/*global jQuery, OT, tableChangeRules*/
 /*jshint devel:true*/
 (function ($) {
   'use strict';
   var socket = new WebSocket('ws://localhost:8080', 'protocolOne');
 
+  var createRow = function (row, rowIndex) {
+    var $cells = row.map(function (cell, columnIndex) {
+      return $('<td />').append(createInputText(rowIndex, columnIndex, cell));
+    });
+    return $('<tr />').append($cells);
+  };
+
   var initDrawTable = function (data) {
     var $playground = $('#playground');
-    var $rows = data.map(function (row, rowIndex) {
-      var $cells = row.map(function (cell, columnIndex) {
-        return $('<td />').append(createInputText(rowIndex, columnIndex, cell));
-      });
-      return $('<tr />').append($cells);
-    });
+    var $rows = data.map(createRow);
     var $table = $('<table />').append($rows);
-    $playground.append($table);
+    $playground.html($table);
   };
 
   var ot = new OT({
     onInit: initDrawTable
   });
-  
-  ot.setExecuteActions({
-    updateCell: function (request) {
-      var value = request.value;
-      var data = ot.getData();
-      data[value.rowIndex][value.columnIndex] = value.value;
-      $('#R' + value.rowIndex + 'C' + value.columnIndex).val(value.value);
-    }
+  tableChangeRules(ot);
+
+  ot.onModelChange('updateCell', function (request) {
+    var value = request.value;
+    $('#R' + value.rowIndex + 'C' + value.columnIndex).val(value.value);
   });
 
-  ot.setTransformationMatrix({
-    updateCell: {
-      updateCell: function (newRequest, oldRequest) {
-        if (newRequest.value.rowIndex !== oldRequest.value.rowIndex || newRequest.value.columnIndex !== oldRequest.value.columnIndex) {
-          return newRequest;
-        }
-        if (newRequest.priority < oldRequest.priority) {
-          return newRequest;
-        }
-        var value = JSON.parse(JSON.stringify(oldRequest.value));
-        newRequest.value = value;
-        return newRequest;
-      }
-    }
+  ot.onModelChange('addRow', function () {
+    initDrawTable(ot.getData());
+  });
+
+  ot.onModelChange('deleteRow', function () {
+    initDrawTable(ot.getData());
   });
 
   socket.onmessage = function (event) {
     ot.processRequest(event.data);
   };
+
+  var triggerRequest = function (message) {
+    var request = JSON.parse(message);
+    ot.execute(request);
+    socket.send(message);
+  };
+
+  var addRow = function () {
+    var message = ot.createMessage('addRow', {
+      rowIndex: +$('#row-position').val()
+    });
+    triggerRequest(message);
+  };
+  $('#add-row').on('click', addRow);
+
+  var deleteRow = function () {
+    var message = ot.createMessage('deleteRow', {
+      rowIndex: +$('#row-position').val()
+    });
+    triggerRequest(message);
+  };
+  $('#delete-row').on('click', deleteRow);
 
   var change = function (rowIndex, columnIndex, value) {
     var message = ot.createMessage('updateCell', {
@@ -55,9 +68,7 @@
       columnIndex: columnIndex,
       value: value
     });
-    var request = JSON.parse(message);
-    ot.execute(request);
-    socket.send(message);
+    triggerRequest(message);
   };
 
   var createInputText = function (rowIndex, columnIndex, value) {
@@ -76,4 +87,5 @@
       }
     });
   };
+
 }(jQuery));

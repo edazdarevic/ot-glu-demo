@@ -1,4 +1,4 @@
-/*global OT*/
+/*global OT, tableChangeRules*/
 /*jslint node:true*/
 'use strict';
 var WebSocketServer = require('ws').Server;
@@ -14,37 +14,16 @@ var includeInThisContext = function (path) {
   vm.runInThisContext(code, path);
 }.bind(this);
 includeInThisContext(__dirname + '/public/ot.js');
+includeInThisContext(__dirname + '/public/tableChange.js');
 
 var data = require('./database/data.json');
 var priority = 0;
 var states = [];
 
 var ot = new OT();
+tableChangeRules(ot);
 ot.setData(data);
 ot.setStates(states);
-
-ot.setExecuteActions({
-  updateCell: function (request) {
-    var value = request.value;
-    data[value.rowIndex][value.columnIndex] = request.value.value;
-  }
-});
-
-ot.setTransformationMatrix({
-  updateCell: {
-    updateCell: function (newRequest, oldRequest) {
-      if (newRequest.value.rowIndex !== oldRequest.value.rowIndex || newRequest.value.columnIndex !== oldRequest.value.columnIndex) {
-        return newRequest;
-      }
-      if (newRequest.priority < oldRequest.priority) {
-        return newRequest;
-      }
-      var value = JSON.parse(JSON.stringify(oldRequest.value));
-      newRequest.value = value;
-      return newRequest;
-    }
-  }
-});
 
 wss.on('connection', function (ws) {
   states[priority] = 0;
@@ -66,7 +45,7 @@ wss.on('connection', function (ws) {
       wss.clients.forEach(function (client) {
         client.send(message);
       });
-    }, 5000);
+    }, 2000);
   });
 });
 

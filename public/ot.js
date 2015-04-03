@@ -5,10 +5,10 @@ var OT = (function () {
   var priority, data;
   var states = [];
   var log = [];
-  var que = [];
   var executeActions = {};
   var transformationMatrix = {};
   var options;
+  var onModelChangeEvents = {};
 
   var OT = function (o) {
     options = o || {};
@@ -48,16 +48,38 @@ var OT = (function () {
     return JSON.stringify(json);
   };
 
+  OT.prototype.onModelChange = function (action, callback) {
+    if (typeof callback !== 'function') {
+      throw 'Callback has to be a function';
+    }
+    if (!onModelChangeEvents[action]) {
+      onModelChangeEvents[action] = [];
+    }
+    onModelChangeEvents[action].push(callback);
+  };
+
   var execute = function (request) {
     var action = executeActions[request.action];
     if (action) {
       action(request);
+    }
+    var onModelChangeCallback = onModelChangeEvents[request.action];
+    if (onModelChangeCallback) {
+      onModelChangeCallback.forEach(function (callback) {
+        callback(request);
+      });
     }
     states[request.priority] += 1;
     log.push(request);
   };
 
   OT.prototype.execute = execute;
+
+  OT.prototype.markAsNoOp = function (request) {
+    request.originalAction = request.action;
+    request.action = 'no-op';
+    return request;
+  };
 
   var compareState = function (requestState, currentState) {
     var shouldTransform = false;
@@ -75,7 +97,7 @@ var OT = (function () {
   };
 
   var transform = function (newRequest, oldRequest) {
-    if (transformationMatrix[newRequest.action] && transformationMatrix[newRequest.action][oldRequest.action]) {
+    if (newRequest && transformationMatrix[newRequest.action] && transformationMatrix[newRequest.action][oldRequest.action]) {
       return transformationMatrix[newRequest.action][oldRequest.action](newRequest, oldRequest);
     }
     return newRequest;
@@ -98,6 +120,9 @@ var OT = (function () {
         options.onNewUser(request);
       }
       break;
+    case 'no-op':
+      execute(request);
+      break;
     default:
       if (priority !== request.priority) {
         switch (compareState(request.states, states)) {
@@ -108,7 +133,7 @@ var OT = (function () {
         case 1:
           // this action has to be put into que, and wait for other actions
           // but since we use web socket, this shouldn't happen anyway
-          que.push(request);
+          // que.push(request);
           // TODO: when to fire que?
           break;
         case -1:
@@ -128,7 +153,7 @@ var OT = (function () {
         }
       }
     }
-    console.log(data, states, log, que);
+    console.log(request.action, data, states, log);
   };
 
   return OT;
