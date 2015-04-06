@@ -3,12 +3,19 @@
 var GridView = require('./components/grid/GridView');
 var GridController = require('./components/grid/GridController');
 
+var GridActionsView = require('./components/gridActions/GridActionsView');
+var GridActionsController = require('./components/gridActions/GridActionsController');
+
 var App = {
   init: function () {
-    var view = new GridView(document.body);
-    new GridController(view);
+    var gridView = new GridView(document.body, '#grid');
+    new GridController(gridView);
 
-    view.render();
+    var actionView = new GridActionsView(document.body, '#actions');
+    new GridActionsController(actionView);
+
+    gridView.render();
+    actionView.render();
   }
 };
 

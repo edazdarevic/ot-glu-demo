@@ -10,7 +10,7 @@ var RowViewReact = React.createClass({
         key={index}
         columnIndex={index}
         rowIndex={this.props.rowIndex}
-        view={this.props.view}/>);
+        updateCell={this.props.updateCell}/>);
     }
     return <tr>{cells}</tr>;
   }

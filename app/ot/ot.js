@@ -158,3 +158,5 @@ var OT = (function () {
 
   return OT;
 }());
+
+module.exports = OT;

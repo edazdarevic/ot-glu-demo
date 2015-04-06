@@ -1,8 +1,23 @@
 'use strict';
 
 var RowViewReact = require('./RowViewReact.js');
+var TableActions = require('../../actions/TableActions.js');
 
 var GridViewReact = React.createClass({
+  getInitialState(): any {
+    return {data: this.props.data};
+  },
+  updateCell(rowIndex, columnIndex, value, comit): any {
+    this.props.data[rowIndex][columnIndex] = value;
+    this.setState({data: this.props.data});
+    if (comit) {
+      this.props.view.emit(TableActions.UPDATE_CELL, {
+        rowIndex: rowIndex,
+        columnIndex: columnIndex,
+        value: value
+      });
+    }
+  },
   render(): any {
     var headers = [];
     var rows = [];
@@ -12,7 +27,7 @@ var GridViewReact = React.createClass({
         row={row}
         key={index}
         rowIndex={index}
-        view={this.props.view}/>);
+        updateCell={this.updateCell}/>);
     }
     return <table>
       <thead>

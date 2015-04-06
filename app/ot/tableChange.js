@@ -98,3 +98,5 @@ var tableChangeRules = (function () {
     ot.setTransformationMatrix(transformationMatrix);
   };
 }());
+
+module.exports = tableChangeRules;

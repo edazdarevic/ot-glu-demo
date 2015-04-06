@@ -1,22 +1,15 @@
-/*global OT, tableChangeRules*/
 /*jslint node:true*/
 'use strict';
+var database = './database/data.json';
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({
   port: 8080
 });
 
 // load OT
-var fs = require('fs');
-var vm = require('vm');
-var includeInThisContext = function (path) {
-  var code = fs.readFileSync(path);
-  vm.runInThisContext(code, path);
-}.bind(this);
-includeInThisContext(__dirname + '/public/ot.js');
-includeInThisContext(__dirname + '/public/tableChange.js');
-
-var data = require('./database/data.json');
+var OT = require('./app/ot/ot.js');
+var tableChangeRules = require('./app/ot/tableChange.js');
+var data = require(database);
 var priority = 0;
 var states = [];
 
@@ -24,6 +17,17 @@ var ot = new OT();
 tableChangeRules(ot);
 ot.setData(data);
 ot.setStates(states);
+
+var fs = require('fs');
+var save = function (data) {
+  fs.writeFile(database, JSON.stringify(data, null, 2), function (err) {
+    if (err) {
+      return console.log(err);
+    }
+
+    console.log('The file was saved!');
+  });
+};
 
 wss.on('connection', function (ws) {
   states[priority] = 0;
@@ -45,7 +49,8 @@ wss.on('connection', function (ws) {
       wss.clients.forEach(function (client) {
         client.send(message);
       });
-    }, 2000);
+      save(data);
+    }, 1);
   });
 });
 

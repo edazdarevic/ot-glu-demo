@@ -7,13 +7,21 @@ class GridView extends GLU.View {
   constructor(root, selector) {
     super(root, selector);
 
-    data = [['asdf', 'mujo'],['bfs', 123]];
+    data = [];
     view = this;
   }
 
   render() {
     React.render(<GridViewReact data={data} view={view} />,
       this.el);
+  }
+  get data() {
+    return data;
+  }
+
+  set data(d) {
+    data = d;
+    this.render();
   }
 }
 
