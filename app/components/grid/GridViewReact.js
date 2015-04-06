@@ -7,10 +7,17 @@ var GridViewReact = React.createClass({
   getInitialState(): any {
     return {data: this.props.data};
   },
-  updateCell(rowIndex, columnIndex, value, comit): any {
+  updateCell(rowIndex, columnIndex, value, action): any {
+    if (action === 'focus') {
+      this.props.view.emit(TableActions.USER_CHANGE_POSITION, {
+        rowIndex: rowIndex,
+        columnIndex: columnIndex
+      });
+      return;
+    }
     this.props.data[rowIndex][columnIndex] = value;
     this.setState({data: this.props.data});
-    if (comit) {
+    if (action) {
       this.props.view.emit(TableActions.UPDATE_CELL, {
         rowIndex: rowIndex,
         columnIndex: columnIndex,
@@ -27,6 +34,7 @@ var GridViewReact = React.createClass({
         row={row}
         key={index}
         rowIndex={index}
+        usersPosition={this.props.usersPosition}
         updateCell={this.updateCell}/>);
     }
     return <table>

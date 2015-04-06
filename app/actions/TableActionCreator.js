@@ -12,6 +12,9 @@ class TableActionCreator {
   static deleteRow(payload) {
     GLU.bus.emitAction(TableActions.DELETE_ROW, payload);
   }
+  static userChangePosition(payload) {
+    GLU.bus.emitAction(TableActions.USER_CHANGE_POSITION, payload);
+  }
 }
 
 module.exports = TableActionCreator;

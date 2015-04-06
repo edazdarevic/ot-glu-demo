@@ -1,6 +1,6 @@
 'use strict';
 
-var data, view;
+var data, usersPosition, view;
 var GridViewReact = require('./GridViewReact.js');
 
 class GridView extends GLU.View {
@@ -8,19 +8,39 @@ class GridView extends GLU.View {
     super(root, selector);
 
     data = [];
+    usersPosition = {};
     view = this;
   }
 
   render() {
-    React.render(<GridViewReact data={data} view={view} />,
+    React.render(<GridViewReact
+      data={data}
+      usersPosition={usersPosition}
+      view={view}/>,
       this.el);
   }
+
+  updateState(d, up) {
+    data = d;
+    usersPosition = up
+    this.render();
+  }
+
   get data() {
     return data;
   }
 
   set data(d) {
     data = d;
+    this.render();
+  }
+
+  get usersPosition() {
+    return usersPosition;
+  }
+
+  set usersPosition(up) {
+    usersPosition = up;
     this.render();
   }
 }

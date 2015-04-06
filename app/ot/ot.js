@@ -9,6 +9,7 @@ var OT = (function () {
   var transformationMatrix = {};
   var options;
   var onModelChangeEvents = {};
+  var usersPosition = {};
 
   var OT = function (o) {
     options = o || {};
@@ -28,6 +29,11 @@ var OT = (function () {
 
   OT.prototype.getPriority = function () {
     return priority;
+  };
+
+
+  OT.prototype.getUsersPostion = function () {
+    return usersPosition;
   };
 
   OT.prototype.setExecuteActions = function (actions) {
@@ -75,6 +81,7 @@ var OT = (function () {
 
   OT.prototype.execute = execute;
 
+
   OT.prototype.markAsNoOp = function (request) {
     request.originalAction = request.action;
     request.action = 'no-op';
@@ -118,6 +125,12 @@ var OT = (function () {
       states[request.value] = 0;
       if (typeof options.onNewUser === 'function') {
         options.onNewUser(request);
+      }
+      break;
+    case 'user-change-position':
+      usersPosition[request.priority] = request.value;
+      if (typeof options.onUserPositionChange === 'function') {
+        options.onUserPositionChange(request);
       }
       break;
     case 'no-op':

@@ -14,7 +14,8 @@ class TableStore extends GLU.Store {
     this.bindActions(
       TableActions.UPDATE_CELL, this.updateCell, [],
       TableActions.ADD_ROW, this.updateRow, [],
-      TableActions.DELETE_ROW, this.deleteRow, []
+      TableActions.DELETE_ROW, this.deleteRow, [],
+      TableActions.USER_CHANGE_POSITION, this.userChangePosition, []
     );
   }
 
@@ -26,7 +27,8 @@ class TableStore extends GLU.Store {
     };
 
     ot = new OT({
-      onInit: emitChange
+      onInit: emitChange,
+      onUserPositionChange: emitChange
     });
     tableChangeRules(ot);
 
@@ -43,28 +45,32 @@ class TableStore extends GLU.Store {
     return ot.getData();
   }
 
-  triggerRequest(message) {
+  get usersPosition() {
+    return ot.getUsersPostion();
+  }
+
+  triggerRequest(action, payload) {
+    var message = ot.createMessage(action, payload);
     var request = JSON.parse(message);
     ot.execute(request);
     socket.send(message);
+    this.emitChange();
   }
 
   updateCell(payload) {
-    var message = ot.createMessage(TableActions.UPDATE_CELL, payload);
-    this.triggerRequest(message);
-    this.emitChange();
+    this.triggerRequest(TableActions.UPDATE_CELL, payload);
   }
 
   updateRow(payload) {
-    var message = ot.createMessage(TableActions.ADD_ROW, payload);
-    this.triggerRequest(message);
-    this.emitChange();
+    this.triggerRequest(TableActions.ADD_ROW, payload);
   }
 
   deleteRow(payload) {
-    var message = ot.createMessage(TableActions.DELETE_ROW, payload);
-    this.triggerRequest(message);
-    this.emitChange();
+    this.triggerRequest(TableActions.DELETE_ROW, payload);
+  }
+
+  userChangePosition(payload) {
+    this.triggerRequest(TableActions.USER_CHANGE_POSITION, payload);
   }
 }
 
