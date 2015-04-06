@@ -9,4 +9,4 @@ After cloning repo, run:
     grunt dev
     node app.js
 
-Web server will run on port `5555`. Open one or more web browsers and enjoj!
+Web server will run on port `5555`. Open one or more web browsers and enjoy!
