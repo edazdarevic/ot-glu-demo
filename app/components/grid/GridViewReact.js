@@ -25,10 +25,15 @@ var GridViewReact = React.createClass({
       });
     }
   },
-  render(): any {
-    var headers = [];
+    onHamoClick: function(e) {
+        APP.router.navigateTo('/category/new');
+        e.preventDefault();
+    },
+      render(): any {
+          var headers = [];
     var rows = [];
-    if (this.props.data[0]) {
+
+    if (this.props.data && this.props.data[0]) {
       headers = this.props.data[0].map((name, index) => <th>Col {index + 1}</th>);
       rows = this.props.data.map((row, index) => <RowViewReact
         row={row}
@@ -37,14 +42,21 @@ var GridViewReact = React.createClass({
         usersPosition={this.props.usersPosition}
         updateCell={this.updateCell}/>);
     }
-    return <table>
+    return (
+        <div>
+        ID IS : {this.props.id}
+        {(new Date()).toString()}
+        <table>
       <thead>
         <tr>{headers}</tr>
       </thead>
       <tbody>
         {rows}
       </tbody>
-    </table>;
+    </table>
+    <a href="/mujo" onClick={this.onHamoClick}>New view(navigate)</a>
+    <div id="subtemplate"></div>
+    </div>);
   }
 });
 

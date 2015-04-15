@@ -28,6 +28,7 @@
     "lodash-node": "^3.6.0",
     "route-recognizer": "^0.1.5",
     "express": "^4.12.3",
-    "ws": "^0.7.1"
+    "ws": "^0.7.1",
+    "glu.js": "git+ssh://git@github.com/SocialExplorer/glu.js.git"
   }
 }

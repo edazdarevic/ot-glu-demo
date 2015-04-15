@@ -6,34 +6,6 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         browserify: {
-            glu: {
-                src: ['src/glu.js'],
-                dest: 'demo/glu.bundle.js',
-                options: {
-                    browserifyOptions: {
-                        standalone: 'GLU',
-                        debug: true
-
-                    },
-                    transform: ['babelify'],
-                    watch: true,
-                    postBundleCB: function (err, src, next) {
-                        if (err) {
-                            throw err;
-                        }
-                        var through = require('through');
-                        var stream = through().pause().queue(src).end();
-                        var buffer = '';
-
-                        stream.pipe(require('mold-source-map').transformSourcesRelativeTo(__dirname + '/demo')).pipe(through(function (chunk) {
-                            buffer += chunk.toString();
-                        }, function () {
-                            next(err, buffer);
-                        }));
-                        stream.resume();
-                    }
-                }
-            },
             demo: {
                 src: ['app/app.js'],
                 dest: 'demo/app.bundle.js',
@@ -165,5 +137,5 @@ module.exports = function (grunt) {
     // Default task(s).
     grunt.registerTask('default', []);
     grunt.registerTask('deploy', ['browserify']);
-    grunt.registerTask('dev', ['browserify:glu', 'browserify:demo', 'connect:server:keepalive']);
+    grunt.registerTask('dev', ['browserify:demo', 'connect:server:keepalive']);
 };

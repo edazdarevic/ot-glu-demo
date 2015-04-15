@@ -4,6 +4,7 @@ var TableActions = require('../actions/TableActions');
 var OT = require('../ot/ot.js');
 var tableChangeRules = require('../ot/tableChange.js');
 var socket, ot;
+var GLU = require('glu.js');
 
 class TableStore extends GLU.Store {
   constructor() {

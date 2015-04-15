@@ -2,6 +2,7 @@
 var TableActions = require('../../actions/TableActions.js');
 var TableActionCreator = require('../../actions/TableActionCreator.js');
 
+var GLU = require('glu.js');
 class GridActionsController extends GLU.ViewController {
   constructor(view) {
     super(view);
@@ -16,6 +17,11 @@ class GridActionsController extends GLU.ViewController {
 
   deleteRow(payload) {
     TableActionCreator.deleteRow(payload);
+  }
+
+  destroy() {
+    console.log("destroying GridActionsController");
+    this.view.destroy();
   }
 }
 

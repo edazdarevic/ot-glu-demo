@@ -2,6 +2,8 @@
 
 var TableActions = require('./TableActions');
 
+var GLU = require('glu.js');
+
 class TableActionCreator {
   static updateCell(payload) {
     GLU.bus.emitAction(TableActions.UPDATE_CELL, payload);

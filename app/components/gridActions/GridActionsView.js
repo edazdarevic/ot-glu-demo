@@ -2,8 +2,9 @@
 
 var view;
 var GridActionsViewReact = require('./GridActionsViewReact.js');
+var GLU = require('glu.js');
 
-class GridView extends GLU.View {
+class GridActionsView extends GLU.View {
   constructor(root, selector) {
     super(root, selector);
     view = this;
@@ -13,6 +14,11 @@ class GridView extends GLU.View {
     React.render(<GridActionsViewReact view={view} />,
       this.el);
   }
+
+  destroy() {
+    React.unmountComponentAtNode(this.el);
+    // this.el.innerHTML = "";
+  }
 }
 
-module.exports = GridView;
+module.exports = GridActionsView;
