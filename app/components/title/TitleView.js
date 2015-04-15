@@ -23,7 +23,15 @@ class TitleView extends GLU.View {
 
       //React.unmountComponentAtNode(this.el);
     var date = new Date();
-    this.el.innerHTML = `<div> I Am a title view ${date.toString()}</div>`;
+    this.el.innerHTML = `<div> I Am a TITLE view PARAM IS : ${this._val}</div>`;
+  }
+
+  setParam(val) {
+    this._val = val;
+  }
+
+  getParam() {
+    return this._val;
   }
 }
 
